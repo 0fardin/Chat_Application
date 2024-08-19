@@ -183,7 +183,7 @@ const Registration = () => {
 
             <p className="lg:w-[368px] w-full text-center text-sm text-secondary font-normal lg:mt-[35px] mt-5">
               Already have an account ?{" "}
-              <Link to={"/"} className="text-[#EA6C00] font-bold">
+              <Link to={"/Login"} className="text-[#EA6C00] font-bold">
                 {" "}
                 Sign In
               </Link>
