@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useContext, useState } from "react";
 import Context from "./context/context";
 
 const ContextCheck = () => {
   const [test, setTest] = useState("");
-  const [setName] = useContext(Context);
+  let { setName } = useContext(Context);
 
   const handleChange = (e) => {
     setTest(e.target.value);
@@ -12,6 +11,7 @@ const ContextCheck = () => {
 
   const handleClick = () => {
     setName(test);
+    // setTest(""); // Clear input after submission
   };
 
   return (
@@ -19,19 +19,18 @@ const ContextCheck = () => {
       <div>
         <input
           onChange={handleChange}
+          value={test}
           type="text"
-          className="w-[400px] h-[100px] rounded-xl border-2 outline-primary"
+          className="w-[400px] h-[100px] rounded-xl border shadow-custom outline-primary"
         />
         <button
           onClick={handleClick}
+          disabled={!test.trim()} // Disable button if input is empty
           className="p-5 bg-primary rounded-xl font-extrabold text-white"
         >
           Submit
         </button>
       </div>
-      <ul>
-        <li>{test}</li>
-      </ul>
     </>
   );
 };
