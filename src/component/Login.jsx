@@ -4,7 +4,7 @@
 /* eslint-disable react/jsx-no-undef */
 import React, { useState } from "react";
 import Regis from "../assets/Login.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF } from "react-icons/fa";
@@ -15,11 +15,17 @@ import {
   signInWithPopup,
   FacebookAuthProvider,
 } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { UserLogininfo } from "../../UserSlice";
+import { getDatabase, ref, set } from "firebase/database";
 
 const Login = () => {
+  const db = getDatabase();
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const providerFa = new FacebookAuthProvider();
+  const navigate = useNavigate();
+  let dispatch = useDispatch();
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   let [emailerr, setEmailerr] = useState("");
@@ -49,9 +55,11 @@ const Login = () => {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           const user = userCredential.user;
-          alert("ok!!!!!!");
+          dispatch(UserLogininfo(user));
+          localStorage.setItem("user", JSON.stringify(user));
           setEmail("");
           setPassword("");
+          navigate("/");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -65,8 +73,20 @@ const Login = () => {
   };
   let handleGoogleLogin = () => {
     signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log(result);
+      .then((userCredential) => {
+        const user = userCredential.user;
+        dispatch(UserLogininfo(user));
+        localStorage.setItem("user", JSON.stringify(user));
+        set(ref(db, "users/" + userCredential.user.uid), {
+          username: userCredential.user.displayName,
+          email: userCredential.user.email,
+          profile_picture: userCredential.user.photoURL,
+        }).then(() => {
+          setEmail("");
+          setPassword("");
+          navigate("/");
+        });
+        console.log(userCredential);
       })
       .catch((error) => {
         console.log(error);

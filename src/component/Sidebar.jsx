@@ -5,6 +5,7 @@ import { AiFillMessage } from "react-icons/ai";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
 import { ImExit } from "react-icons/im";
+import { MdOutlineCloudUpload } from "react-icons/md";
 
 const Sidebar = () => {
   return (
@@ -12,11 +13,16 @@ const Sidebar = () => {
       <div className=" h-screen p-5">
         <div className="w-[186px] h-full bg-primary rounded-lg flex flex-col justify-between">
           <div className="pt-10">
-            <img
-              className="w-[100px] h-[100px] rounded-full mx-auto "
-              src={women}
-              alt="women"
-            />
+            <div className="w-[100px] h-[100px] mx-auto rounded-full relative group cursor-pointer">
+              <img
+                className="w-full h-full rounded-full  "
+                src={women}
+                alt="women"
+              />
+              <div className="w-full h-full rounded-full bg-black/75 absolute top-0 left-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <MdOutlineCloudUpload className="text-white font-bold text-3xl " />
+              </div>
+            </div>
           </div>
           <div className="flex gap-24 flex-col">
             <div className="relative">

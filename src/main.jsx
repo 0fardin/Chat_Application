@@ -1,14 +1,18 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
+import ReactDOM from "react-dom/client"; // Import from 'react-dom/client' in React 18
 import "./index.css";
-import firebaseConfig from "../firebase.config.js";
-import UserProviderContext from "./context/UserProviderContext.jsx";
+import App from "./App";
+import { store } from "../Store";
+import { Provider } from "react-redux";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+// Create a root
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+// Render the App with Provider
+root.render(
   <React.StrictMode>
-    <UserProviderContext>
+    <Provider store={store}>
       <App />
-    </UserProviderContext>
+    </Provider>
   </React.StrictMode>
 );

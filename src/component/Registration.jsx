@@ -5,10 +5,18 @@ import React, { useState } from "react";
 import Regis from "../assets/Registration.png";
 import { Link, useNavigate } from "react-router-dom";
 import { IoEye, IoEyeOff } from "react-icons/io5";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
+import { getDatabase, ref, set } from "firebase/database";
 import { RotatingLines } from "react-loader-spinner";
+import Human from "/public/Human.jpg";
 
 const Registration = () => {
+  const db = getDatabase();
   const auth = getAuth();
   let navigate = useNavigate();
   let [email, setEmail] = useState("");
@@ -49,11 +57,28 @@ const Registration = () => {
     if (email && name && password) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          setSuccess(true);
-          setTimeout(() => {
-            const user = userCredential.user;
-            navigate("/");
-          }, 1000);
+          console.log(userCredential.user);
+          sendEmailVerification(auth.currentUser).then(() => {
+            updateProfile(auth.currentUser, {
+              displayName: name,
+              photoURL: Human,
+            })
+              .then(() => {
+                set(ref(db, "users/" + userCredential.user.uid), {
+                  username: userCredential.user.displayName,
+                  email: userCredential.user.email,
+                  profile_picture: Human,
+                }).then(() => {
+                  setSuccess(true);
+                  setTimeout(() => {
+                    navigate("/login");
+                  }, 1000);
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          });
         })
         .catch((error) => {
           const errorCode = error.code;
