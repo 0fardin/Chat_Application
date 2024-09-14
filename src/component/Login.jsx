@@ -18,6 +18,7 @@ import {
 import { useDispatch } from "react-redux";
 import { UserLogininfo } from "../../UserSlice";
 import { getDatabase, ref, set } from "firebase/database";
+import moment from "moment";
 
 const Login = () => {
   const db = getDatabase();
@@ -81,12 +82,12 @@ const Login = () => {
           username: userCredential.user.displayName,
           email: userCredential.user.email,
           profile_picture: userCredential.user.photoURL,
+          Date: moment().format("MM D YYYY, h:mm:ss a"),
         }).then(() => {
           setEmail("");
           setPassword("");
           navigate("/");
         });
-        console.log(userCredential);
       })
       .catch((error) => {
         console.log(error);

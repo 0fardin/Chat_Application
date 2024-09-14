@@ -14,10 +14,14 @@ import {
 import { getDatabase, ref, set } from "firebase/database";
 import { RotatingLines } from "react-loader-spinner";
 import Human from "/public/Human.jpg";
+import { useDispatch } from "react-redux";
+import { UserLogininfo } from "../../UserSlice";
+import moment from "moment";
 
 const Registration = () => {
   const db = getDatabase();
   const auth = getAuth();
+  let dispatch = useDispatch();
   let navigate = useNavigate();
   let [email, setEmail] = useState("");
   let [name, setName] = useState("");
@@ -57,7 +61,6 @@ const Registration = () => {
     if (email && name && password) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          console.log(userCredential.user);
           sendEmailVerification(auth.currentUser).then(() => {
             updateProfile(auth.currentUser, {
               displayName: name,
@@ -68,6 +71,7 @@ const Registration = () => {
                   username: userCredential.user.displayName,
                   email: userCredential.user.email,
                   profile_picture: Human,
+                  Date: moment().format("MM D YYYY, h:mm:ss a"),
                 }).then(() => {
                   setSuccess(true);
                   setTimeout(() => {
