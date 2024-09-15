@@ -15,7 +15,7 @@ const FriendsRequest = () => {
     onValue(FriendRequestRef, (snapshot) => {
       let array = [];
       snapshot.forEach((item) => {
-        if (data.uid == item.val().receiverid) {
+        if (data.uid == item.val().senderid) {
           array.push(item.val());
           console.log(item.val());
         }

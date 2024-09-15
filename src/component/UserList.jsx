@@ -50,15 +50,19 @@ const UserList = () => {
       senderid: data.uid,
       senderName: data.displayName,
       senderEmail: data.email,
-      senderPhoto: data.photoUrl,
+      // senderPhoto: data.photoUrl,
       receiverid: item.id,
       receiverName: item.username,
       receiverEmail: item.email,
-      receiverPhoto: item.profile_picture,
+      // receiverPhoto: item.profile_picture,
       Date: moment().format("MM D YYYY, h:mm a"),
-    }).then(() => {
-      alert("Friend Request success!");
-    });
+    })
+      .then(() => {
+        alert("Friend Request success!");
+      })
+      .catch(() => {
+        console.log("Request jay nai");
+      });
   };
 
   let handleFriendRequestCancel = (item) => {
