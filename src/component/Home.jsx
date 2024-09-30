@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { UserLogininfo } from "../../UserSlice";
+import Messages from "./Messages";
 
 const Home = () => {
   const auth = getAuth();
@@ -22,7 +23,7 @@ const Home = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         dispatch(UserLogininfo(user));
-        localStorage.setItem("user", JSON.stringify(user));
+        // localStorage.setItem("user", JSON.stringify(user));
       } else {
         navigate("/Login");
         setVerify(false);
@@ -57,6 +58,9 @@ const Home = () => {
             <UserList />
             <BlockedUser />
           </div>
+          {/* <div>
+            <Messages />
+          </div> */}
         </div>
       ) : (
         <div>

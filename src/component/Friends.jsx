@@ -1,8 +1,62 @@
-import React from "react";
+/* eslint-disable react/jsx-key */
+import React, { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import Lips from "../assets/lips.jpg";
+import Lips from "../assets/Human.jpg";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  push,
+  remove,
+} from "firebase/database";
+import moment from "moment";
+import { useSelector } from "react-redux";
 
 const Friends = () => {
+  const db = getDatabase();
+  let data = useSelector((state) => state.Userinfo.value);
+  let [friendlist, setFriendlist] = useState([]);
+
+  useEffect(() => {
+    const Friends = ref(db, "FriendList/");
+    onValue(Friends, (snapshot) => {
+      let array = [];
+      snapshot.forEach((item) => {
+        console.log(item.key);
+
+        if (
+          data.uid == item.val().receiverid ||
+          data.uid == item.val().senderid
+        ) {
+          array.push({ ...item.val(), key: item.key });
+        }
+      });
+      setFriendlist(array);
+    });
+  }, []);
+
+  let handleBlocked = (item) => {
+    set(push(ref(db, "BlockedUser/")), {
+      senderid: item.receiverid,
+      senderName: item.receiverName,
+      senderPhoto: item.receiverPhoto,
+      receiverid: item.senderid,
+      receiverName: item.senderName,
+      receiverPhoto: item.senderPhoto,
+      Date: item.Date,
+    })
+      .then(() => {
+        remove(ref(db, "FriendList/" + item.key));
+      })
+      .then(() => {
+        alert("User Blocked!");
+      })
+      .catch(() => {
+        alert("Blocked hoy nai");
+      });
+  };
+
   return (
     <>
       <div className="w-[427px]  bg-white rounded-xl shadow-custom px-5 pt-5">
@@ -12,186 +66,45 @@ const Friends = () => {
         </div>
         <div className="w-full h-[360px] overflow-y-scroll">
           <div className="flex flex-col gap-7">
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
+            {friendlist.map((item) => (
+              <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
+                <div className="flex items-center gap-4">
+                  {data.uid == item.senderid ? (
+                    <img
+                      src={(item && item.receiverPhoto) || Lips}
+                      alt="Women"
+                      className="w-[70px] h-[70px] rounded-full"
+                    />
+                  ) : (
+                    <img
+                      src={(item && item.senderPhoto) || Lips}
+                      alt="Women"
+                      className="w-[70px] h-[70px] rounded-full"
+                    />
+                  )}
+                  <div>
+                    {data.uid == item.senderid ? (
+                      <h2 className="text-lg font-semibold text-black">
+                        {item.receiverName}
+                      </h2>
+                    ) : (
+                      <h2 className="text-lg font-semibold text-black">
+                        {item.senderName}
+                      </h2>
+                    )}
+                    <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
+                      {moment().format("MM D YYYY, h:mm:ss a")}
+                    </p>
+                  </div>
                 </div>
+                <button
+                  onClick={() => handleBlocked(item)}
+                  className="py-2 px-5 bg-primary rounded-lg text-white"
+                >
+                  Block
+                </button>
               </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-              <div className="flex items-center gap-4">
-                <img
-                  src={Lips}
-                  alt="Women"
-                  className="w-[70px] h-[70px] rounded-full"
-                />
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Friends Reunion
-                  </h2>
-                  <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                    Hi Guys, Wassup!
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                Today, 8:56pm
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </div>
