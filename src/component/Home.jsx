@@ -22,7 +22,7 @@ const Home = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         dispatch(UserLogininfo(user));
-        localStorage.setItem("user", JSON.stringify(user));
+        // localStorage.setItem("user", JSON.stringify(user));
       } else {
         navigate("/Login");
         setVerify(false);
@@ -57,6 +57,9 @@ const Home = () => {
             <UserList />
             <BlockedUser />
           </div>
+          {/* <div>
+            <Messages />
+          </div> */}
         </div>
       ) : (
         <div>

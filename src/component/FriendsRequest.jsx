@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import lady from "../assets/ladyy.jpg";
-import { getDatabase, onValue, ref } from "firebase/database";
+import lady from "../assets/Human.jpg";
+import {
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  remove,
+  set,
+} from "firebase/database";
 import { useSelector } from "react-redux";
 import moment from "moment";
 
@@ -15,14 +22,21 @@ const FriendsRequest = () => {
     onValue(FriendRequestRef, (snapshot) => {
       let array = [];
       snapshot.forEach((item) => {
-        if (data.uid == item.val().senderid) {
-          array.push(item.val());
-          console.log(item.val());
+        if (data.uid == item.val().receiverid) {
+          array.push({ ...item.val(), key: item.key });
         }
       });
       setFriendsRequest(array);
     });
   }, []);
+
+  let handleAccept = (item) => {
+    set(push(ref(db, "FriendList/")), {
+      ...item,
+    }).then(() => {
+      remove(ref(db, "friendRequest/" + item.key));
+    });
+  };
 
   return (
     <>
@@ -54,7 +68,10 @@ const FriendsRequest = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="py-2 px-5 bg-primary rounded-lg text-white">
+                  <button
+                    onClick={() => handleAccept(item)}
+                    className="py-2 px-5 bg-primary rounded-lg text-white"
+                  >
                     Accept
                   </button>
                 </div>

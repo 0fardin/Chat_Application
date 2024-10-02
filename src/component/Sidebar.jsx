@@ -36,7 +36,6 @@ const Sidebar = () => {
   const cropperRef = createRef();
   let [imageModal, setImageModal] = useState(false);
   let [success, setSuccess] = useState(false);
-  console.log(data.Userinfo.value.displayName);
 
   let handleFile = (e) => {
     let files;
