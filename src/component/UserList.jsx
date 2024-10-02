@@ -23,6 +23,7 @@ const UserList = () => {
   let [requestList, setRequestList] = useState([]);
   let [friendList, setFriendList] = useState([]);
   let [searchicon, setSearchicon] = useState(false);
+  let [searchList, setSearchlist] = useState([]);
 
   useEffect(() => {
     const UserRef = ref(db, "users");
@@ -77,7 +78,12 @@ const UserList = () => {
       });
   };
 
-  let handleSearch = () => {};
+  let handleSearch = (e) => {
+    let search = userList.filter((item) =>
+      item.username.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setSearchlist(search);
+  };
 
   // let handleFriendRequestCancel = (item) => {
   //   remove(ref(db, "friendRequest/", +item.id), {
@@ -133,46 +139,87 @@ const UserList = () => {
         </div>
         <div className="w-full h-[330px] overflow-y-scroll">
           <div className="flex flex-col gap-7">
-            {userList.map((item) => (
-              <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={item && item.profile_picture}
-                    alt="Women"
-                    className="w-[70px] h-[70px] rounded-full"
-                  />
-                  <div>
-                    <h2 className="text-lg font-semibold text-black">
-                      {item && item.username}
-                    </h2>
-                    <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                      {moment(item.Date).fromNow()}
-                    </p>
+            {searchList.length > 0
+              ? searchList.map((item) => (
+                  <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={item && item.profile_picture}
+                        alt="Women"
+                        className="w-[70px] h-[70px] rounded-full"
+                      />
+                      <div>
+                        <h2 className="text-lg font-semibold text-black">
+                          {item && item.username}
+                        </h2>
+                        <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
+                          {moment(item.Date).fromNow()}
+                        </p>
+                      </div>
+                    </div>
+                    {friendList.includes(data.uid + item.id) ||
+                    friendList.includes(item.id + data.uid) ? (
+                      <button className="py-2 px-5 bg-white border border-primary rounded-lg text-primary">
+                        <TiTick />
+                      </button>
+                    ) : requestList.includes(data.uid + item.id) ||
+                      requestList.includes(item.id + data.uid) ? (
+                      <button
+                        // onClick={() => handleFriendRequestCancel(item)}
+                        className="py-2 px-5 bg-secondary rounded-lg text-white"
+                      >
+                        Pending
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleFriendRequest(item)}
+                        className="py-2 px-5 bg-primary rounded-lg text-white"
+                      >
+                        <FaPlus />
+                      </button>
+                    )}
                   </div>
-                </div>
-                {friendList.includes(data.uid + item.id) ||
-                friendList.includes(item.id + data.uid) ? (
-                  <button className="py-2 px-5 bg-white border border-primary rounded-lg text-primary">
-                    <TiTick />
-                  </button>
-                ) : requestList.includes(data.uid + item.id) ||
-                  requestList.includes(item.id + data.uid) ? (
-                  <button
-                    // onClick={() => handleFriendRequestCancel(item)}
-                    className="py-2 px-5 bg-secondary rounded-lg text-white"
-                  >
-                    Pending
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleFriendRequest(item)}
-                    className="py-2 px-5 bg-primary rounded-lg text-white"
-                  >
-                    <FaPlus />
-                  </button>
-                )}
-              </div>
-            ))}
+                ))
+              : userList.map((item) => (
+                  <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={item && item.profile_picture}
+                        alt="Women"
+                        className="w-[70px] h-[70px] rounded-full"
+                      />
+                      <div>
+                        <h2 className="text-lg font-semibold text-black">
+                          {item && item.username}
+                        </h2>
+                        <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
+                          {moment(item.Date).fromNow()}
+                        </p>
+                      </div>
+                    </div>
+                    {friendList.includes(data.uid + item.id) ||
+                    friendList.includes(item.id + data.uid) ? (
+                      <button className="py-2 px-5 bg-white border border-primary rounded-lg text-primary">
+                        <TiTick />
+                      </button>
+                    ) : requestList.includes(data.uid + item.id) ||
+                      requestList.includes(item.id + data.uid) ? (
+                      <button
+                        // onClick={() => handleFriendRequestCancel(item)}
+                        className="py-2 px-5 bg-secondary rounded-lg text-white"
+                      >
+                        Pending
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleFriendRequest(item)}
+                        className="py-2 px-5 bg-primary rounded-lg text-white"
+                      >
+                        <FaPlus />
+                      </button>
+                    )}
+                  </div>
+                ))}
           </div>
         </div>
       </div>
