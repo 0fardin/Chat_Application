@@ -37,13 +37,15 @@ const Friends = () => {
   }, []);
 
   let handleBlocked = (item) => {
+    console.log(item);
+
     set(push(ref(db, "BlockedUser/")), {
-      senderid: item.receiverid,
-      senderName: item.receiverName,
-      senderPhoto: item.receiverPhoto,
-      receiverid: item.senderid,
-      receiverName: item.senderName,
-      receiverPhoto: item.senderPhoto,
+      senderid: item.senderid,
+      senderName: item.senderName,
+      senderPhoto: item.senderPhoto,
+      receiverid: item.receiverid,
+      receiverName: item.receiverName,
+      receiverPhoto: item.receiverPhoto,
       Date: item.Date,
     })
       .then(() => {

@@ -35,6 +35,8 @@ const BlockedUser = () => {
   }, []);
 
   let handleUnblock = (item) => {
+    console.log(item);
+
     set(push(ref(db, "FriendList/")), {
       senderid: item.senderid,
       senderName: item.senderName,

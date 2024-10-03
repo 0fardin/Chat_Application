@@ -23,6 +23,8 @@ import Human from "/public/Human.jpg";
 import { getDatabase, ref as dref, update, remove } from "firebase/database";
 import moment from "moment";
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { NavLink } from "react-router-dom";
+import Messages from "./Messages";
 
 const Sidebar = () => {
   let data = useSelector((state) => state);
@@ -136,24 +138,35 @@ const Sidebar = () => {
               </div>
             </div>
           </div>
-          <div className="flex gap-24 flex-col">
-            <div className="relative">
-              <div className="w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
-              <IoHomeOutline className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
-            </div>
-            <div className="relative">
+          <ul className="flex gap-24 flex-col">
+            <li className="relative">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative shadow-2xl ${
+                    isActive
+                      ? "after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg"
+                      : ""
+                  }`
+                }
+              >
+                <IoHomeOutline className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%]" />
+              </NavLink>
+            </li>
+
+            <li className="relative">
               <div className="hidden w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
               <AiFillMessage className="text-[#BAD1FF] text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
-            </div>
-            <div className="relative">
+            </li>
+            <li className="relative">
               <div className="hidden w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
               <IoMdNotificationsOutline className="text-white text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
-            </div>
-            <div className="relative">
+            </li>
+            <li className="relative">
               <div className="hidden w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
               <IoSettingsOutline className="text-white text-5xl mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
-            </div>
-          </div>
+            </li>
+          </ul>
           <div className="pb-10">
             <ImExit
               onClick={handleLogOut}
