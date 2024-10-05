@@ -38,26 +38,49 @@ const Friends = () => {
 
   let handleBlocked = (item) => {
     console.log(item);
-
-    set(push(ref(db, "BlockedUser/")), {
-      senderid: item.senderid,
-      senderName: item.senderName,
-      senderPhoto: item.senderPhoto,
-      receiverid: item.receiverid,
-      receiverName: item.receiverName,
-      receiverPhoto: item.receiverPhoto,
-      Date: item.Date,
-    })
-      .then(() => {
-        remove(ref(db, "FriendList/" + item.key));
+    if (data.uid == item.senderid) {
+      set(push(ref(db, "BlockedUser/")), {
+        senderid: item.senderid,
+        senderName: item.senderName,
+        senderPhoto: item.senderPhoto,
+        receiverid: item.receiverid,
+        receiverName: item.receiverName,
+        receiverPhoto: item.receiverPhoto,
+        Date: item.Date,
       })
-      .then(() => {
-        alert("User Blocked!");
+        .then(() => {
+          remove(ref(db, "FriendList/" + item.key));
+        })
+        .then(() => {
+          alert("User Blocked!");
+        })
+        .catch(() => {
+          alert("Blocked hoy nai");
+        });
+    } else {
+      set(push(ref(db, "BlockedUser/")), {
+        senderid: item.receiverid,
+        senderName: item.receiverName,
+        senderPhoto: item.receiverPhoto,
+        receiverid: item.senderid,
+        receiverName: item.senderName,
+        receiverPhoto: item.senderPhoto,
+        Date: item.Date,
       })
-      .catch(() => {
-        alert("Blocked hoy nai");
-      });
+        .then(() => {
+          remove(ref(db, "FriendList/" + item.key));
+        })
+        .then(() => {
+          alert("User Blocked!");
+        })
+        .catch(() => {
+          alert("Blocked hoy nai");
+        });
+    }
   };
+
+  //
+  // };
 
   return (
     <>
