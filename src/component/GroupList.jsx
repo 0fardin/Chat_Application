@@ -37,6 +37,8 @@ const GroupList = () => {
 
     set(push(ref(db, "MyGroup/")), {
       name: groupName,
+      adminid: data.uid,
+      adminName: data.displayName,
     })
       .then(() => {
         alert("group Success!");

@@ -7,7 +7,7 @@ import { IoSendSharp } from "react-icons/io5";
 const Messages = () => {
   return (
     <>
-      <div className="w-[690px] h-[956px] border border-primary">
+      <div className="w-[690px] h-[956px] mt-5 border border-primary">
         <div className=" w-full h-full flex flex-col justify-between p-5">
           <div className="flex justify-between items-center border-b border-black/50 py-4">
             <div className=" flex gap-5 items-center">

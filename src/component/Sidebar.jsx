@@ -1,4 +1,4 @@
-import React, { createRef, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import women from "../assets/lady5.jpg";
 import { IoHomeOutline } from "react-icons/io5";
 import { AiFillMessage } from "react-icons/ai";
@@ -15,22 +15,23 @@ import {
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { v4 as uuid } from "uuid";
-import { getAuth, updateProfile, deleteUser } from "firebase/auth";
+import { getAuth, updateProfile, signOut } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { UserLogininfo } from "../../UserSlice";
 import { ProgressBar } from "react-loader-spinner";
 import Human from "/public/Human.jpg";
-import { getDatabase, ref as dref, update, remove } from "firebase/database";
+import { getDatabase, ref as dref, update } from "firebase/database";
 import moment from "moment";
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
-import { NavLink } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Messages from "./Messages";
 
 const Sidebar = () => {
-  let data = useSelector((state) => state);
+  let data = useSelector((state) => state.Userinfo.value);
   let dispatch = useDispatch();
   const db = getDatabase();
   const auth = getAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const user = auth.currentUser;
   const storage = getStorage();
   const [image, setImage] = useState("");
@@ -38,6 +39,8 @@ const Sidebar = () => {
   const cropperRef = createRef();
   let [imageModal, setImageModal] = useState(false);
   let [success, setSuccess] = useState(false);
+  let [navi, setNavi] = useState(null);
+  console.log(data);
 
   let handleFile = (e) => {
     let files;
@@ -84,32 +87,28 @@ const Sidebar = () => {
   };
 
   let handleLogOut = () => {
-    const user = auth.currentUser;
-    const uid = user.uid;
-    const credential = EmailAuthProvider.credential(
-      user.email,
-      prompt("Please confirm your password")
-    );
-    reauthenticateWithCredential(user, credential)
+    const auth = getAuth();
+    signOut(auth)
       .then(() => {
-        console.log("User re-authenticated.");
-        deleteUser(user)
-          .then(() => {
-            // localStorage.removeItem("user");
-            const userRef = ref(db, "users/" + uid);
-            return remove(userRef);
-          })
-          .then(() => {
-            console.log("User deleted from Firebase Realtime Database.");
-          })
-          .catch((error) => {
-            console.error("Error removing user from Firebase:", error);
-          });
+        localStorage.clear();
+        navigate("/login");
       })
       .catch((error) => {
-        console.error("Error re-authenticating:", error);
+        console.log(error);
       });
   };
+
+  useEffect(() => {
+    if (navi === "Messages") {
+      navigate("/Messages");
+    } else if (navi === "/") {
+      navigate("/");
+    } else if (navi === "/Notification") {
+      navigate("/Notification");
+    } else if (navi === "/Settings") {
+      navigate("/Settings");
+    }
+  }, [navi, navigate]);
 
   return (
     <>
@@ -119,16 +118,12 @@ const Sidebar = () => {
             <div className="w-[100px] h-[100px] mx-auto rounded-full relative group cursor-pointer">
               <img
                 className="w-full h-full rounded-full"
-                src={(data && data?.Userinfo?.value?.photoURL) || Human} // Nullish coalescing operator
-                alt={
-                  data?.Userinfo?.value?.photoURL
-                    ? "User photo"
-                    : "Human placeholder"
-                }
+                src={data ? data.photoURL : Human}
+                alt="User photo"
               />
 
               <h1 className=" text-white text-xl font-bold text-center mt-4">
-                {data && data.Userinfo.value.displayName}
+                {data && data.displayName}
               </h1>
               <div
                 onClick={() => setImageModal(true)}
@@ -138,23 +133,64 @@ const Sidebar = () => {
               </div>
             </div>
           </div>
-          <ul className="flex gap-24 flex-col">
-            <li className="relative">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative shadow-2xl ${
-                    isActive
-                      ? "after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg"
-                      : ""
-                  }`
-                }
+          <ul className="flex gap-10 flex-col">
+            {location.pathname == "/" ? (
+              <li className="relative cursor-pointer">
+                <div className=" w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
+                <IoHomeOutline className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            ) : (
+              <li
+                onClick={() => setNavi("/")}
+                className="relative cursor-pointer"
               >
-                <IoHomeOutline className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%]" />
-              </NavLink>
-            </li>
-
-            <li className="relative">
+                <div className=" w-[161px] h-[89px] bg-primary ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg "></div>
+                <IoHomeOutline className="text-[#BAD1FF] text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            )}
+            {location.pathname == "/Messages" ? (
+              <li className="relative cursor-pointer">
+                <div className=" w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
+                <AiFillMessage className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            ) : (
+              <li
+                onClick={() => setNavi("Messages")}
+                className="relative cursor-pointer"
+              >
+                <div className=" w-[161px] h-[89px] bg-primary ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg "></div>
+                <AiFillMessage className="text-[#BAD1FF] text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            )}
+            {location.pathname == "/Notification" ? (
+              <li className="relative cursor-pointer">
+                <div className=" w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
+                <IoMdNotificationsOutline className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            ) : (
+              <li
+                onClick={() => setNavi("/Notification")}
+                className="relative cursor-pointer"
+              >
+                <div className=" w-[161px] h-[89px] bg-primary ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg "></div>
+                <IoMdNotificationsOutline className="text-[#BAD1FF] text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            )}
+            {location.pathname == "/Settings" ? (
+              <li className="relative cursor-pointer">
+                <div className=" w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
+                <IoSettingsOutline className="text-primary text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            ) : (
+              <li
+                onClick={() => setNavi("/Settings")}
+                className="relative cursor-pointer"
+              >
+                <div className=" w-[161px] h-[89px] bg-primary ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg "></div>
+                <IoSettingsOutline className="text-[#BAD1FF] text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
+              </li>
+            )}
+            {/* <li className="relative">
               <div className="hidden w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
               <AiFillMessage className="text-[#BAD1FF] text-[46px] mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
             </li>
@@ -165,7 +201,7 @@ const Sidebar = () => {
             <li className="relative">
               <div className="hidden w-[161px] h-[89px] bg-white ml-auto rounded-s-lg relative after:w-3 after:h-full after:bg-primary after:absolute after:top-0 after:right-0 after:rounded-s-lg shadow-2xl"></div>
               <IoSettingsOutline className="text-white text-5xl mx-auto absolute top-2/4 left-2/4 translate-x-[-50%] translate-y-[-50%] " />
-            </li>
+            </li> */}
           </ul>
           <div className="pb-10">
             <ImExit
