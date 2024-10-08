@@ -2,14 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set,
-  push,
-  remove,
-} from "firebase/database";
+import { getDatabase, ref, onValue, set, push } from "firebase/database";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { TiTick } from "react-icons/ti";

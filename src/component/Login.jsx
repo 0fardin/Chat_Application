@@ -16,7 +16,7 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 import { useDispatch } from "react-redux";
-import { UserLogininfo } from "../../UserSlice";
+import { UserLogininfo } from "../slice/UserSlice";
 import { getDatabase, ref, set } from "firebase/database";
 import moment from "moment";
 

@@ -11,9 +11,13 @@ import {
   remove,
 } from "firebase/database";
 import moment from "moment";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { Chattinginfo } from "../slice/ChatSlice";
 
 const Friends = () => {
+  const location = useLocation();
+  const dispatch = useDispatch();
   const db = getDatabase();
   let data = useSelector((state) => state.Userinfo.value);
   let [friendlist, setFriendlist] = useState([]);
@@ -23,8 +27,6 @@ const Friends = () => {
     onValue(Friends, (snapshot) => {
       let array = [];
       snapshot.forEach((item) => {
-        console.log(item.key);
-
         if (
           data.uid == item.val().receiverid ||
           data.uid == item.val().senderid
@@ -37,7 +39,6 @@ const Friends = () => {
   }, []);
 
   let handleBlocked = (item) => {
-    console.log(item);
     if (data.uid == item.senderid) {
       set(push(ref(db, "BlockedUser/")), {
         senderid: item.senderid,
@@ -79,8 +80,25 @@ const Friends = () => {
     }
   };
 
-  //
-  // };
+  let handleChat = (item) => {
+    if (data.uid == item.senderid) {
+      dispatch(
+        Chattinginfo({
+          name: item.receiverName,
+          id: item.receiverid,
+          photo: item.receiverPhoto,
+        })
+      );
+    } else {
+      dispatch(
+        Chattinginfo({
+          name: item.senderName,
+          id: item.senderid,
+          photo: item.senderPhoto,
+        })
+      );
+    }
+  };
 
   return (
     <>
@@ -91,45 +109,83 @@ const Friends = () => {
         </div>
         <div className="w-full h-[360px] overflow-y-scroll">
           <div className="flex flex-col gap-7">
-            {friendlist.map((item) => (
-              <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25">
-                <div className="flex items-center gap-4">
-                  {data.uid == item.senderid ? (
-                    <img
-                      src={(item && item.receiverPhoto) || Lips}
-                      alt="Women"
-                      className="w-[70px] h-[70px] rounded-full"
-                    />
-                  ) : (
-                    <img
-                      src={(item && item.senderPhoto) || Lips}
-                      alt="Women"
-                      className="w-[70px] h-[70px] rounded-full"
-                    />
-                  )}
-                  <div>
+            {friendlist.map((item) =>
+              location.pathname == "/" ? (
+                <div className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25 cursor-pointer">
+                  <div className="flex items-center gap-4">
                     {data.uid == item.senderid ? (
-                      <h2 className="text-lg font-semibold text-black">
-                        {item.receiverName}
-                      </h2>
+                      <img
+                        src={(item && item.receiverPhoto) || Lips}
+                        alt="Women"
+                        className="w-[70px] h-[70px] rounded-full"
+                      />
                     ) : (
-                      <h2 className="text-lg font-semibold text-black">
-                        {item.senderName}
-                      </h2>
+                      <img
+                        src={(item && item.senderPhoto) || Lips}
+                        alt="Women"
+                        className="w-[70px] h-[70px] rounded-full"
+                      />
                     )}
-                    <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                      {moment().format("MM D YYYY, h:mm:ss a")}
-                    </p>
+                    <div>
+                      {data.uid == item.senderid ? (
+                        <h2 className="text-lg font-semibold text-black">
+                          {item.receiverName}
+                        </h2>
+                      ) : (
+                        <h2 className="text-lg font-semibold text-black">
+                          {item.senderName}
+                        </h2>
+                      )}
+                      <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
+                        {moment().format("MM D YYYY, h:mm:ss a")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleBlocked(item)}
+                    className="py-2 px-5 bg-primary rounded-lg text-white"
+                  >
+                    Block
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => handleChat(item)}
+                  className="flex justify-between items-center pb-3 border-b-2 border-black border-opacity-25 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4">
+                    {data.uid == item.senderid ? (
+                      <img
+                        src={(item && item.receiverPhoto) || Lips}
+                        alt="Women"
+                        className="w-[70px] h-[70px] rounded-full"
+                      />
+                    ) : (
+                      <img
+                        src={(item && item.senderPhoto) || Lips}
+                        alt="Women"
+                        className="w-[70px] h-[70px] rounded-full"
+                      />
+                    )}
+                    <div>
+                      {data.uid == item.senderid ? (
+                        <h2 className="text-lg font-semibold text-black">
+                          {item.receiverName}
+                        </h2>
+                      ) : (
+                        <h2 className="text-lg font-semibold text-black">
+                          {item.senderName}
+                        </h2>
+                      )}
+                      <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
+                        {moment().format("MM D YYYY, h:mm:ss a")}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleBlocked(item)}
-                  className="py-2 px-5 bg-primary rounded-lg text-white"
-                >
-                  Block
-                </button>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import BlockedUser from "./BlockedUser";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { UserLogininfo } from "../../UserSlice";
+import { UserLogininfo } from "../slice/UserSlice";
 
 const Home = () => {
   const auth = getAuth();

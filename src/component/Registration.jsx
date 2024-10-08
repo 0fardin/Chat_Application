@@ -15,7 +15,7 @@ import { getDatabase, ref, set } from "firebase/database";
 import { RotatingLines } from "react-loader-spinner";
 import Human from "/public/Human.jpg";
 import { useDispatch } from "react-redux";
-import { UserLogininfo } from "../../UserSlice";
+import { UserLogininfo } from "../slice/UserSlice";
 import moment from "moment";
 
 const Registration = () => {

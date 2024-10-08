@@ -17,7 +17,7 @@ import "cropperjs/dist/cropper.css";
 import { v4 as uuid } from "uuid";
 import { getAuth, updateProfile, signOut } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { UserLogininfo } from "../../UserSlice";
+import { UserLogininfo } from "../slice/UserSlice";
 import { ProgressBar } from "react-loader-spinner";
 import Human from "/public/Human.jpg";
 import { getDatabase, ref as dref, update } from "firebase/database";
