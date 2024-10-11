@@ -116,7 +116,7 @@ const Friends = () => {
                     {data.uid == item.senderid ? (
                       <img
                         src={(item && item.receiverPhoto) || Lips}
-                        alt="Women"
+                        alt="human"
                         className="w-[70px] h-[70px] rounded-full"
                       />
                     ) : (

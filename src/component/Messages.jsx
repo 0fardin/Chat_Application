@@ -18,7 +18,6 @@ const Messages = () => {
   let [sendboxmodal, setSendboxmodal] = useState(false);
   let [textmsg, setTextmsg] = useState("");
   let [sendmsg, setSendmsg] = useState([]);
-  console.log(chatdata.id);
 
   let handleTextmsg = (e) => {
     setTextmsg(e.target.value);
@@ -54,7 +53,7 @@ const Messages = () => {
       });
       setSendmsg(array);
     });
-  }, []);
+  }, [chatdata, data.uid, db]);
 
   return (
     <>
@@ -72,7 +71,7 @@ const Messages = () => {
                     <img
                       className="w-full h-full rounded-full"
                       src={chatdata ? chatdata.photo : Human}
-                      alt=""
+                      alt="Human"
                     />
                     <div className="w-4 h-4 bg-green-400 rounded-full outline outline-white absolute bottom-0 right-0"></div>
                   </div>
@@ -90,8 +89,8 @@ const Messages = () => {
                   data.uid == item.senderid ? (
                     <div className=" flex flex-row-reverse">
                       <div className="flex flex-col items-end mt-5 ">
-                        <div className="w-2/4">
-                          <h2 className=" w-fit p-5 rounded-2xl text-sm text-white font-semibold bg-primary ">
+                        <div className="max-w-[400px]">
+                          <h2 className=" break-words p-5 rounded-2xl text-sm text-white font-semibold bg-primary ">
                             {item.msg}
                           </h2>
                         </div>
@@ -102,8 +101,8 @@ const Messages = () => {
                     </div>
                   ) : (
                     <div className="flex flex-col items-start mt-5">
-                      <div className="w-2/4">
-                        <h2 className=" w-fit p-5 rounded-2xl text-sm text-black font-semibold bg-primary/30 ">
+                      <div className="max-w-[400px]">
+                        <h2 className=" break-words p-5 rounded-2xl text-sm text-black font-semibold bg-primary/30 ">
                           {item.msg}
                         </h2>
                       </div>
