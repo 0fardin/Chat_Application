@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { IoCameraOutline } from "react-icons/io5";
@@ -10,17 +10,24 @@ import { useSelector } from "react-redux";
 import Human from "/public/Human.jpg";
 import moment from "moment";
 import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import EmojiPicker from "emoji-picker-react";
+import { Cropper } from "react-cropper";
 
 const Messages = () => {
   const db = getDatabase();
+  const cropperRef = createRef();
   let chatdata = useSelector((state) => state.Chattinginfo.value);
   let data = useSelector((state) => state.Userinfo.value);
   let [sendboxmodal, setSendboxmodal] = useState(false);
   let [textmsg, setTextmsg] = useState("");
   let [sendmsg, setSendmsg] = useState([]);
+  let [openEmoji, setOpenEmoji] = useState(false);
+  let [imageModal, setImageModal] = useState(false);
+  const [image, setImage] = useState("");
 
   let handleTextmsg = (e) => {
     setTextmsg(e.target.value);
+    setOpenEmoji(false);
   };
 
   let handleSendmsg = () => {
@@ -34,6 +41,8 @@ const Messages = () => {
     }).then(() => {
       setTextmsg("");
       setSendboxmodal("");
+      setOpenEmoji(false);
+      setImageModal(false);
     });
   };
 
@@ -54,6 +63,24 @@ const Messages = () => {
       setSendmsg(array);
     });
   }, [chatdata, data.uid, db]);
+
+  let handleEmojiClick = (e) => {
+    setTextmsg((prev) => prev + e.emoji);
+  };
+
+  let handleFile = (e) => {
+    let files;
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if (e.target) {
+      files = e.target.files;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImage(reader.result);
+    };
+    reader.readAsDataURL(files[0]);
+  };
 
   return (
     <>
@@ -127,8 +154,66 @@ const Messages = () => {
                     placeholder="Send Message"
                     type="text"
                   ></input>
-                  <MdOutlineEmojiEmotions className=" text-2xl absolute top-2/4 right-[60px] translate-y-[-50%] cursor-pointer" />
-                  <IoCameraOutline className=" text-2xl font-bold absolute top-2/4 right-[20px] translate-y-[-50%] cursor-pointer" />
+                  <MdOutlineEmojiEmotions
+                    onClick={() => setOpenEmoji(true)}
+                    className=" text-2xl absolute top-2/4 right-[60px] translate-y-[-50%] cursor-pointer"
+                  />
+                  {openEmoji && (
+                    <div className=" absolute bottom-[50px] right-0">
+                      <EmojiPicker onEmojiClick={handleEmojiClick} />
+                    </div>
+                  )}
+                  <IoCameraOutline
+                    onClick={() => setImageModal(true)}
+                    className=" text-2xl font-bold absolute top-2/4 right-[20px] translate-y-[-50%] cursor-pointer"
+                  />
+                  {imageModal && (
+                    <div className=" w-[500px] bg-white rounded-lg border border-primary p-5 flex flex-col gap-10 z-50 absolute bottom-[50px] right-0">
+                      <div className="flex flex-col gap-3">
+                        <h1 className="text-black text-xl font-medium">
+                          <span className="text-primary font-bold">Upload</span>{" "}
+                          Your Profile Picture{" "}
+                          <span className="text-primary font-extrabold ">
+                            !
+                          </span>
+                        </h1>
+                        <input onChange={handleFile} type="file"></input>
+                        {image && (
+                          <Cropper
+                            ref={cropperRef}
+                            style={{ height: 400, width: "100%" }}
+                            zoomTo={0.5}
+                            initialAspectRatio={1}
+                            preview=".img-preview"
+                            src={image}
+                            viewMode={1}
+                            minCropBoxHeight={10}
+                            minCropBoxWidth={10}
+                            background={false}
+                            responsive={true}
+                            autoCropArea={1}
+                            checkOrientation={false}
+                            guides={true}
+                          />
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <button
+                          onClick={handleSendmsg}
+                          className=" px-4 py-3 bg-white border border-primary rounded-lg text-primary font-bold hover:bg-primary hover:text-white transition-all duration-300"
+                        >
+                          Submit
+                        </button>
+
+                        <button
+                          onClick={() => setImageModal(false)}
+                          className=" px-4 py-3 bg-white border border-red-600 rounded-lg text-red-700 font-bold hover:bg-red-600 hover:text-white transition-all duration-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={handleSendmsg}
