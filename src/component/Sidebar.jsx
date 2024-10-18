@@ -40,7 +40,6 @@ const Sidebar = () => {
   let [imageModal, setImageModal] = useState(false);
   let [success, setSuccess] = useState(false);
   let [navi, setNavi] = useState(null);
-  console.log(data);
 
   let handleFile = (e) => {
     let files;

@@ -12,9 +12,18 @@ import moment from "moment";
 import { getDatabase, onValue, push, ref, set } from "firebase/database";
 import EmojiPicker from "emoji-picker-react";
 import { Cropper } from "react-cropper";
+import {
+  getDownloadURL,
+  getStorage,
+  ref as sref,
+  uploadBytes,
+} from "firebase/storage";
+import { v4 as uuid } from "uuid";
+import ScrollToBottom from "react-scroll-to-bottom";
 
 const Messages = () => {
   const db = getDatabase();
+  const storage = getStorage();
   const cropperRef = createRef();
   let chatdata = useSelector((state) => state.Chattinginfo.value);
   let data = useSelector((state) => state.Userinfo.value);
@@ -31,19 +40,21 @@ const Messages = () => {
   };
 
   let handleSendmsg = () => {
-    set(push(ref(db, "msg/")), {
-      senderid: data.uid,
-      sendername: data.displayName,
-      receiverid: chatdata.id,
-      receivername: chatdata.name,
-      msg: textmsg,
-      date: moment().format("MM D YYYY, h:mm a"),
-    }).then(() => {
-      setTextmsg("");
-      setSendboxmodal("");
-      setOpenEmoji(false);
-      setImageModal(false);
-    });
+    if (textmsg) {
+      set(push(ref(db, "msg/")), {
+        senderid: data.uid,
+        sendername: data.displayName,
+        receiverid: chatdata.id,
+        receivername: chatdata.name,
+        msg: textmsg,
+        date: moment().format("MM D YYYY, h:mm a"),
+      }).then(() => {
+        setTextmsg("");
+        setSendboxmodal(false);
+        setOpenEmoji(false);
+        setImageModal(false);
+      });
+    }
   };
 
   useEffect(() => {
@@ -82,6 +93,28 @@ const Messages = () => {
     reader.readAsDataURL(files[0]);
   };
 
+  let handleimagesend = () => {
+    const storageRef = sref(storage, uuid());
+    uploadBytes(storageRef, image).then(() => {
+      getDownloadURL(storageRef).then((downloadURL) => {
+        set(push(ref(db, "msg/")), {
+          senderid: data.uid,
+          sendername: data.displayName,
+          receiverid: chatdata.id,
+          receivername: chatdata.name,
+          image: downloadURL,
+          date: moment().format("MM D YYYY, h:mm a"),
+        }).then(() => {
+          setTextmsg("");
+          setSendboxmodal(false);
+          setOpenEmoji(false);
+          setImageModal(false);
+          setImage("");
+        });
+      });
+    });
+  };
+
   return (
     <>
       <div className=" flex gap-10">
@@ -111,15 +144,23 @@ const Messages = () => {
                 </div>
                 <BsThreeDotsVertical className=" text-primary text-xl " />
               </div>
-              <div className=" h-full px-5 flex flex-col gap-5 overflow-y-scroll ">
+              <ScrollToBottom className="  w-full h-full flex flex-col gap-5 overflow-y-auto ">
                 {sendmsg.map((item) =>
                   data.uid == item.senderid ? (
                     <div className=" flex flex-row-reverse">
                       <div className="flex flex-col items-end mt-5 ">
                         <div className="max-w-[400px]">
-                          <h2 className=" break-words p-5 rounded-2xl text-sm text-white font-semibold bg-primary ">
-                            {item.msg}
-                          </h2>
+                          {item.msg ? (
+                            <h2 className=" break-words p-5 rounded-2xl text-sm text-white font-semibold bg-primary ">
+                              {item.msg}
+                            </h2>
+                          ) : (
+                            <img
+                              className=" w-[400px] rounded-xl"
+                              src={item.image}
+                              alt="image"
+                            />
+                          )}
                         </div>
                         <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
                           {item.date}
@@ -129,9 +170,17 @@ const Messages = () => {
                   ) : (
                     <div className="flex flex-col items-start mt-5">
                       <div className="max-w-[400px]">
-                        <h2 className=" break-words p-5 rounded-2xl text-sm text-black font-semibold bg-primary/30 ">
-                          {item.msg}
-                        </h2>
+                        {item.msg ? (
+                          <h2 className=" break-words p-5 rounded-2xl text-sm text-black font-semibold bg-primary/30 ">
+                            {item.msg}
+                          </h2>
+                        ) : (
+                          <img
+                            className=" w-[400px] rounded-xl"
+                            src={item.image}
+                            alt="image"
+                          />
+                        )}
                       </div>
                       <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
                         {item.date}
@@ -139,7 +188,7 @@ const Messages = () => {
                     </div>
                   )
                 )}
-              </div>
+              </ScrollToBottom>
               <div className=" border-t pt-10 pb-5 flex gap-6 items-center">
                 <div
                   onClick={() => setSendboxmodal(true)}
@@ -199,7 +248,7 @@ const Messages = () => {
                       </div>
                       <div className="flex justify-between items-center">
                         <button
-                          onClick={handleSendmsg}
+                          onClick={handleimagesend}
                           className=" px-4 py-3 bg-white border border-primary rounded-lg text-primary font-bold hover:bg-primary hover:text-white transition-all duration-300"
                         >
                           Submit
