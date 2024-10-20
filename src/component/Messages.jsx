@@ -17,6 +17,7 @@ import {
   getStorage,
   ref as sref,
   uploadBytes,
+  uploadString,
 } from "firebase/storage";
 import { v4 as uuid } from "uuid";
 import ScrollToBottom from "react-scroll-to-bottom";
@@ -95,7 +96,11 @@ const Messages = () => {
 
   let handleimagesend = () => {
     const storageRef = sref(storage, uuid());
-    uploadBytes(storageRef, image).then(() => {
+    uploadString(
+      storageRef,
+      cropperRef.current.cropper.getCroppedCanvas().toDataURL(),
+      "data_url"
+    ).then((snapshot) => {
       getDownloadURL(storageRef).then((downloadURL) => {
         set(push(ref(db, "msg/")), {
           senderid: data.uid,
