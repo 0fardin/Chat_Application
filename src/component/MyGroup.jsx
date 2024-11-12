@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import Lips from "../assets/lady2.jpg";
+import Lips from "/public/Human.jpg";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { useSelector } from "react-redux";
 
@@ -16,13 +16,9 @@ const MyGroup = () => {
     onValue(group, (snapshot) => {
       let array = [];
       snapshot.forEach((item) => {
-        if (
-          data.uid == item.val().receiverid ||
-          data.uid == item.val().senderid
-        ) {
-          array.push({ ...item.val(), key: item.key });
-        }
+        array.push({ ...item.val(), key: item.key });
       });
+
       setMyGroupList(array);
     });
   }, []);
@@ -45,15 +41,17 @@ const MyGroup = () => {
                     className="w-[70px] h-[70px] rounded-full"
                   />
                   <div>
-                    <h2 className="text-lg font-semibold text-black">llll</h2>
+                    <h2 className="text-lg font-semibold text-black">
+                      {item.name}
+                    </h2>
                     <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
-                      Hi Guys, Wassup!
+                      {item.date}
                     </p>
                   </div>
                 </div>
-                <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
+                {/* <p className="text-sm font-medium text-[#4D4D4D] opacity-75">
                   Today, 8:56pm
-                </p>
+                </p> */}
               </div>
             ))}
           </div>
