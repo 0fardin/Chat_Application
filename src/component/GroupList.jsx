@@ -5,6 +5,7 @@ import { MdOutlineGroupAdd } from "react-icons/md";
 import { getDatabase, onValue, push, ref, set } from "firebase/database";
 import { useSelector } from "react-redux";
 import { RxCross2 } from "react-icons/rx";
+import moment from "moment";
 
 const GroupList = () => {
   const db = getDatabase();
@@ -32,13 +33,13 @@ const GroupList = () => {
   let handleGroupName = (e) => {
     setGroupName(e.target.value);
   };
-  let CreateGroup = () => {
-    console.log("click");
 
+  let CreateGroup = () => {
     set(push(ref(db, "MyGroup/")), {
       name: groupName,
       adminid: data.uid,
       adminName: data.displayName,
+      date: moment().format("MM D YYYY, h:mm:ss a"),
     })
       .then(() => {
         alert("group Success!");
